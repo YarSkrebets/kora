@@ -7,7 +7,6 @@ pluginManagement {
 }
 
 
-
 rootProject.name = 'kora'
 
 include(
@@ -37,7 +36,11 @@ include(
     'logging:logging-logback',
     'annotation-processors',
     'symbol-processors',
-    'grpc',
+    'grpc:grpc-server',
+    'grpc:grpc-client',
+    'grpc:grpc-common',
+    'grpc:grpc-client-annotation-processor',
+    'grpc:grpc-client-ksp',
     'database:database-annotation-processor',
     'database:database-symbol-processor',
     'database:database-common',
