@@ -35,8 +35,6 @@ protobuf {
     }
 }
 
-apply from: "${project.rootDir}/in-test-generated.gradle"
-
 sourceSets {
     test {
         java {

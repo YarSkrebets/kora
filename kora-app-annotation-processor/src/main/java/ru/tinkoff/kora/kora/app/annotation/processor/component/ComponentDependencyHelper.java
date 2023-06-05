@@ -2,8 +2,8 @@ package ru.tinkoff.kora.kora.app.annotation.processor.component;
 
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
-import ru.tinkoff.kora.annotation.processor.common.AnnotationUtils;
 import ru.tinkoff.kora.annotation.processor.common.CommonClassNames;
+import ru.tinkoff.kora.annotation.processor.common.CommonUtils;
 import ru.tinkoff.kora.annotation.processor.common.TagUtils;
 import ru.tinkoff.kora.kora.app.annotation.processor.component.DependencyClaim.DependencyClaimType;
 import ru.tinkoff.kora.kora.app.annotation.processor.declaration.ComponentDeclaration;
@@ -25,7 +25,7 @@ public class ComponentDependencyHelper {
                 var parameterType = moduleComponent.methodParameterTypes().get(i);
                 var parameterElement = element.getParameters().get(i);
                 var tags = TagUtils.parseTagValue(parameterElement);
-                var isNullable = AnnotationUtils.findAnnotation(parameterElement, name -> name.endsWith("Nullable")) != null;
+                var isNullable = CommonUtils.isNullable(parameterElement);
                 result.add(parseClaim(parameterType, tags, isNullable));
             }
             return result;
@@ -37,7 +37,7 @@ public class ComponentDependencyHelper {
                 var parameterType = type.getParameterTypes().get(i);
                 var parameterElement = element.getParameters().get(i);
                 var tags = TagUtils.parseTagValue(parameterElement);
-                var isNullable = AnnotationUtils.findAnnotation(parameterElement, name -> name.endsWith("Nullable")) != null;
+                var isNullable = CommonUtils.isNullable(parameterElement);
                 result.add(parseClaim(parameterType, tags, isNullable));
             }
             return result;
@@ -49,7 +49,7 @@ public class ComponentDependencyHelper {
                 var parameterType = type.getParameterTypes().get(i);
                 var parameterElement = element.getParameters().get(i);
                 var tags = TagUtils.parseTagValue(parameterElement);
-                var isNullable = AnnotationUtils.findAnnotation(parameterElement, name -> name.endsWith("Nullable")) != null;
+                var isNullable = CommonUtils.isNullable(parameterElement);
                 result.add(parseClaim(parameterType, tags, isNullable));
             }
             return result;
@@ -60,7 +60,7 @@ public class ComponentDependencyHelper {
                 var parameterType = fromExtension.methodParameterTypes().get(i);
                 var parameterElement = element.getParameters().get(i);
                 var tags = TagUtils.parseTagValue(parameterElement);
-                var isNullable = AnnotationUtils.findAnnotation(parameterElement, name -> name.endsWith("Nullable")) != null;
+                var isNullable = CommonUtils.isNullable(parameterElement);
                 result.add(parseClaim(parameterType, tags, isNullable));
             }
             return result;
