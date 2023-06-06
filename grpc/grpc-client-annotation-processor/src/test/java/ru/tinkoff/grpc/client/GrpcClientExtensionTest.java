@@ -12,7 +12,7 @@ import java.util.List;
 
 class GrpcClientExtensionTest extends AbstractAnnotationProcessorTest {
 
-    protected GraphContainer compile(@Language("java") String... sources) {
+    protected void compile(@Language("java") String... sources) {
         var patchedSources = Arrays.copyOf(sources, sources.length + 1);
         patchedSources[sources.length] = """
             @ru.tinkoff.kora.common.Module
@@ -31,21 +31,21 @@ class GrpcClientExtensionTest extends AbstractAnnotationProcessorTest {
         super.compile(List.of(new KoraAppProcessor()), patchedSources);
 
         compileResult.assertSuccess();
-        var g = loadGraph("TestApp");
-        /*
-          1. root config
-          2. parsed config
-          3. netty event loop group
-          4. netty boss event loop group  (will be removed after @Root fix)
-          5. channel factory
-          6. telemetry factory
-          7. channel lifecycle
-          8. service descriptor
-          9. the stub
-          10. test root
-         */
-        Assertions.assertThat(g.draw().size()).isEqualTo(10);
-        return g;
+        try (var g = loadGraph("TestApp");) {
+            /*
+              1. root config
+              2. parsed config
+              3. netty event loop group
+              4. netty boss event loop group  (will be removed after @Root fix)
+              5. channel factory
+              6. telemetry factory
+              7. channel lifecycle
+              8. service descriptor
+              9. the stub
+              10. test root
+             */
+            Assertions.assertThat(g.draw().size()).isEqualTo(10);
+        }
     }
 
 

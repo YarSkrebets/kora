@@ -62,7 +62,7 @@ public final class ManagedChannelLifecycle implements Lifecycle, Wrapped<Managed
             var channel = this.channel;
             this.channel = null;
             if (channel != null) {
-                this.channel.shutdown();
+                channel.shutdown();
             }
             return null;
         });
