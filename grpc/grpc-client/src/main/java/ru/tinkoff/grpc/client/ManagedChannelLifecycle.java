@@ -1,12 +1,12 @@
 package ru.tinkoff.grpc.client;
 
 import io.grpc.ManagedChannel;
-import io.grpc.netty.NettyChannelBuilder;
-import io.netty.channel.EventLoopGroup;
+import io.grpc.ServiceDescriptor;
 import reactor.core.publisher.Mono;
 import ru.tinkoff.grpc.client.config.GrpcClientConfig;
 import ru.tinkoff.grpc.client.config.GrpcClientConfigInterceptor;
 import ru.tinkoff.grpc.client.telemetry.GrpcClientTelemetry;
+import ru.tinkoff.grpc.client.telemetry.GrpcClientTelemetryFactory;
 import ru.tinkoff.grpc.client.telemetry.TelemetryInterceptor;
 import ru.tinkoff.kora.application.graph.Lifecycle;
 import ru.tinkoff.kora.application.graph.Wrapped;
@@ -16,14 +16,16 @@ import java.util.Objects;
 
 public final class ManagedChannelLifecycle implements Lifecycle, Wrapped<ManagedChannel> {
     private final GrpcClientConfig config;
-    private final EventLoopGroup eventLoopGroup;
     private final GrpcClientTelemetry telemetry;
+    private final ServiceDescriptor serviceDefinition;
+    private final GrpcClientChannelFactory channelFactory;
     private volatile ManagedChannel channel;
 
-    public ManagedChannelLifecycle(GrpcClientConfig config, EventLoopGroup eventLoopGroup, GrpcClientTelemetry telemetry) {
+    public ManagedChannelLifecycle(GrpcClientConfig config, ServiceDescriptor serviceDefinition, GrpcClientTelemetryFactory telemetryFactory, GrpcClientChannelFactory channelFactory) {
         this.config = config;
-        this.eventLoopGroup = eventLoopGroup;
-        this.telemetry = telemetry;
+        this.serviceDefinition = serviceDefinition;
+        this.channelFactory = channelFactory;
+        this.telemetry = telemetryFactory.get(serviceDefinition);
     }
 
     @Override
@@ -42,8 +44,7 @@ public final class ManagedChannelLifecycle implements Lifecycle, Wrapped<Managed
                     throw new IllegalArgumentException("Unknown scheme '" + scheme + "'");
                 }
             }
-            var b = NettyChannelBuilder.forAddress(host, port)
-                .eventLoopGroup(this.eventLoopGroup);
+            var b = this.channelFactory.forAddress(host, port);
             if (Objects.equals(scheme, "http")) {
                 b.usePlaintext();
             }

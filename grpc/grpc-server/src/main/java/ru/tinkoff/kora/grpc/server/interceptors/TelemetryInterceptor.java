@@ -18,7 +18,6 @@ public class TelemetryInterceptor implements ServerInterceptor {
         return new TelemetryServerCallListener<>(listener, ctx);
     }
 
-
     private static final class TelemetryServerCall<REQUEST, RESPONSE> extends ForwardingServerCall.SimpleForwardingServerCall<REQUEST, RESPONSE> {
         private final GrpcServerTelemetry.GrpcServerTelemetryContext telemetryContext;
 

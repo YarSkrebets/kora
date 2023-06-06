@@ -13,8 +13,9 @@ public final class GrpcClientConfigInterceptor implements ClientInterceptor {
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(MethodDescriptor<ReqT, RespT> method, CallOptions callOptions, Channel next) {
-        callOptions = callOptions.withDeadlineAfter(this.config.timeout().toMillis(), TimeUnit.MILLISECONDS); // todo per call??
-
+        if (callOptions.getDeadline() == null) {
+            callOptions = callOptions.withDeadlineAfter(this.config.timeout().toMillis(), TimeUnit.MILLISECONDS); // todo per method??
+        }
         return next.newCall(method, callOptions);
     }
 }

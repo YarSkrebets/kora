@@ -14,12 +14,15 @@ import java.util.Set;
 public interface KoraExtension {
     @Nullable
     default KoraExtensionDependencyGenerator getDependencyGenerator(RoundEnvironment roundEnvironment, TypeMirror typeMirror, Set<String> tag) {
+        if (tag.isEmpty()) {
+            return getDependencyGenerator(roundEnvironment, typeMirror);
+        }
         return null;
     }
 
     @Nullable
     default KoraExtensionDependencyGenerator getDependencyGenerator(RoundEnvironment roundEnvironment, TypeMirror typeMirror) {
-        return null;
+        return getDependencyGenerator(roundEnvironment, typeMirror, Set.of());
     }
 
     interface KoraExtensionDependencyGenerator {

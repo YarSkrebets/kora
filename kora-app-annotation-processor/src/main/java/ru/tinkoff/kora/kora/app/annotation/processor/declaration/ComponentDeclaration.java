@@ -1,5 +1,7 @@
 package ru.tinkoff.kora.kora.app.annotation.processor.declaration;
 
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import ru.tinkoff.kora.annotation.processor.common.*;
 import ru.tinkoff.kora.kora.app.annotation.processor.extension.ExtensionResult;
 
@@ -8,6 +10,7 @@ import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 public sealed interface ComponentDeclaration {
     TypeMirror type();
@@ -61,16 +64,13 @@ public sealed interface ComponentDeclaration {
         }
     }
 
-    record FromExtensionComponent(TypeMirror type, ExecutableElement sourceMethod, List<TypeMirror> methodParameterTypes) implements ComponentDeclaration {
-        @Override
-        public Element source() {
-            return this.sourceMethod;
-        }
+    record FromExtensionComponent(TypeMirror type,
+                                  Element source,
+                                  List<TypeMirror> methodParameterTypes,
+                                  List<Set<String>> methodParameterTags,
+                                  Set<String> tags,
+                                  Function<CodeBlock, CodeBlock> generator) implements ComponentDeclaration {
 
-        @Override
-        public Set<String> tags() {
-            return Set.of();
-        }
     }
 
     record PromisedProxyComponent(TypeElement typeElement, TypeMirror type, com.squareup.javapoet.ClassName className) implements ComponentDeclaration {
@@ -137,13 +137,37 @@ public sealed interface ComponentDeclaration {
         var sourceMethod = generatedResult.sourceElement();
         if (sourceMethod.getKind() == ElementKind.CONSTRUCTOR) {
             var parameterTypes = sourceMethod.getParameters().stream().map(VariableElement::asType).toList();
+            var parameterTags = sourceMethod.getParameters().stream().map(TagUtils::parseTagValue).toList();
             var typeElement = (TypeElement) sourceMethod.getEnclosingElement();
+            var tag = TagUtils.parseTagValue(sourceMethod);
+            if (tag.isEmpty()) {
+                tag = TagUtils.parseTagValue(typeElement);
+            }
             var type = typeElement.asType();
-            return new FromExtensionComponent(type, sourceMethod, parameterTypes);
+            var className = ClassName.get(typeElement);
+
+            return new FromExtensionComponent(type, sourceMethod, parameterTypes, parameterTags, tag, dependencies -> typeElement.getTypeParameters().isEmpty()
+                ? CodeBlock.of("new $T($L)", className, dependencies)
+                : CodeBlock.of("new $T>?($L)", className, dependencies));
         } else {
             var type = generatedResult.targetType().getReturnType();
             var parameterTypes = generatedResult.targetType().getParameterTypes();
-            return new FromExtensionComponent(type, sourceMethod, new ArrayList<>(parameterTypes));
+            var parameterTags = sourceMethod.getParameters().stream().map(TagUtils::parseTagValue).toList();
+            var tag = TagUtils.parseTagValue(sourceMethod);
+            var typeElement = (TypeElement) sourceMethod.getEnclosingElement();
+            var className = ClassName.get(typeElement);
+            return new FromExtensionComponent(type, sourceMethod, new ArrayList<>(parameterTypes), parameterTags, tag, dependencies -> CodeBlock.of("$T.$N($L)", className, sourceMethod.getSimpleName(), dependencies));
         }
+    }
+
+    static ComponentDeclaration fromExtension(ExtensionResult.CodeBlockResult generatedResult) {
+        return new FromExtensionComponent(
+            generatedResult.componentType(),
+            generatedResult.source(),
+            generatedResult.dependencyTypes(),
+            generatedResult.dependencyTags(),
+            generatedResult.componentTag(),
+            generatedResult.codeBlock()
+        );
     }
 }

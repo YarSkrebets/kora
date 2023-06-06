@@ -228,8 +228,11 @@ public class GraphResolutionHelper {
                 }
                 declarations.add(new ComponentDeclaration.FromExtensionComponent(
                     realReturnType,
-                    extensionComponent.sourceMethod(),
-                    realParams
+                    extensionComponent.source(),
+                    realParams,
+                    extensionComponent.methodParameterTags(),
+                    extensionComponent.tags(),
+                    extensionComponent.generator()
                 ));
             } else if (sourceDeclaration instanceof ComponentDeclaration.PromisedProxyComponent promisedProxyComponent) {
                 declarations.add(promisedProxyComponent.withType(realReturnType));
