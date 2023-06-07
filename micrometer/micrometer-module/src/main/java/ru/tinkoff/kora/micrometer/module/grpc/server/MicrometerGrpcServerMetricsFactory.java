@@ -5,8 +5,8 @@ import io.grpc.ServerCall;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
-import ru.tinkoff.kora.grpc.common.telemetry.GrpcServerMetrics;
-import ru.tinkoff.kora.grpc.common.telemetry.GrpcServerMetricsFactory;
+import ru.tinkoff.kora.grpc.server.telemetry.GrpcServerMetrics;
+import ru.tinkoff.kora.grpc.server.telemetry.GrpcServerMetricsFactory;
 import ru.tinkoff.kora.micrometer.module.MetricsConfig.GrpcServerMetricsConfig;
 
 import javax.annotation.Nullable;

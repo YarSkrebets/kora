@@ -19,7 +19,10 @@ class ConfigKoraExtension(resolver: Resolver, private val codeGenerator: CodeGen
     private val configParserGenerator = ConfigParserGenerator(resolver)
     private val recordType = resolver.getClassDeclarationByName(Record::class.qualifiedName!!)!!.asStarProjectedType()
 
-    override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
+    override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
+        if (tag.isNotEmpty()) {
+            return null
+        }
         val actualType = if (type.nullability == Nullability.PLATFORM) type.makeNotNullable() else type
         if (actualType.starProjection() != configValueExtractorTypeErasure) {
             return null

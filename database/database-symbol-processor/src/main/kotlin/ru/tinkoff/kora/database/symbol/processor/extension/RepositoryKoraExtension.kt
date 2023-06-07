@@ -18,7 +18,10 @@ import ru.tinkoff.kora.ksp.common.getOuterClassesAsPrefix
 
 @KspExperimental
 class RepositoryKoraExtension(private val kspLogger: KSPLogger) : KoraExtension {
-    override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
+    override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
+        if (tag.isNotEmpty()) {
+            return null
+        }
         if (type.declaration !is KSClassDeclaration) {
             return null
         }

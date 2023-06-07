@@ -14,6 +14,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.util.Set;
 
 public class RepositoryKoraExtension implements KoraExtension {
     private final Elements elements;
@@ -25,7 +26,10 @@ public class RepositoryKoraExtension implements KoraExtension {
     }
 
     @Override
-    public KoraExtensionDependencyGenerator getDependencyGenerator(RoundEnvironment roundEnvironment, TypeMirror typeMirror) {
+    public KoraExtensionDependencyGenerator getDependencyGenerator(RoundEnvironment roundEnvironment, TypeMirror typeMirror, Set<String> tag) {
+        if (!tag.isEmpty()) {
+            return null;
+        }
         if (typeMirror.getKind() != TypeKind.DECLARED) {
             return null;
         }

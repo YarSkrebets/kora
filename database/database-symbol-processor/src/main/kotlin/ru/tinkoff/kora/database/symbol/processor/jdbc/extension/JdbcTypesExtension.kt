@@ -42,7 +42,10 @@ class JdbcTypesExtension(val resolver: Resolver, val kspLogger: KSPLogger, val c
         }
     )
 
-    override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
+    override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
+        if (tag.isNotEmpty()) {
+            return null
+        }
         if (type.declaration.qualifiedName == null) {
             return null
         }

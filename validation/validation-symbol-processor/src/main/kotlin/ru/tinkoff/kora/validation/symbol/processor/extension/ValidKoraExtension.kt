@@ -18,7 +18,10 @@ class ValidKoraExtension(resolver: Resolver, codeGenerator: CodeGenerator) : Kor
 
     private val validatorType = resolver.getClassDeclarationByName(VALIDATOR_TYPE.canonicalName)!!.asStarProjectedType()
 
-    override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
+    override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
+        if (tag.isNotEmpty()) {
+            return null
+        }
         val actualType = if (type.nullability == Nullability.PLATFORM) type.makeNotNullable() else type
         val erasure = actualType.starProjection()
         if (erasure == validatorType) {
