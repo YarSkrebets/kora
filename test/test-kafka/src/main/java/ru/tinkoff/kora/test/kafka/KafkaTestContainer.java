@@ -2,17 +2,11 @@ package ru.tinkoff.kora.test.kafka;
 
 import org.apache.kafka.clients.admin.DeleteTopicsOptions;
 import org.junit.jupiter.api.extension.*;
-import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -32,8 +26,9 @@ public class KafkaTestContainer implements ParameterResolver, AfterEachCallback 
             return;
         }
         if (container == null) {
-            container = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"))
-                .withExposedPorts(9092, 9093);;
+            container = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"))
+                .withExposedPorts(9092, 9093)
+                .withKraft();
 
             container.start();
         }

@@ -148,7 +148,7 @@ public sealed interface ComponentDeclaration {
 
             return new FromExtensionComponent(type, sourceMethod, parameterTypes, parameterTags, tag, dependencies -> typeElement.getTypeParameters().isEmpty()
                 ? CodeBlock.of("new $T($L)", className, dependencies)
-                : CodeBlock.of("new $T>?($L)", className, dependencies));
+                : CodeBlock.of("new $T<>($L)", className, dependencies));
         } else {
             var type = generatedResult.targetType().getReturnType();
             var parameterTypes = generatedResult.targetType().getParameterTypes();
