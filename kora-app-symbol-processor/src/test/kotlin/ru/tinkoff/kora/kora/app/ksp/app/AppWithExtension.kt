@@ -48,8 +48,8 @@ interface AppWithExtension {
     class TestExtension1(val resolver: Resolver, val codeGenerator: CodeGenerator) : KoraExtension {
         private val interfaceDeclaration = resolver.getClassDeclarationByName(Interface1::class.qualifiedName!!)!!
         private val interfaceType = interfaceDeclaration.asStarProjectedType()
-        override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
-            if (type != interfaceType && type != interfaceType.makeNullable()) {
+        override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
+            if (tag.isNotEmpty() || type != interfaceType && type != interfaceType.makeNullable()) {
                 return null
             }
             val packageName = interfaceDeclaration.packageName.asString()
@@ -83,8 +83,8 @@ interface AppWithExtension {
             resolver.getTypeArgument(resolver.createKSTypeReferenceFromKSType(interfaceType), Variance.COVARIANT)
         ))
 
-        override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
-            if (type != optionalType) {
+        override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
+            if (tag.isNotEmpty() || type != optionalType) {
                 return null
             }
             return lambda@{

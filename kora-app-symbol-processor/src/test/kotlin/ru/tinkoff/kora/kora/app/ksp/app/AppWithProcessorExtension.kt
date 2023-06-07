@@ -69,8 +69,11 @@ interface AppWithProcessorExtension {
     class TestExtension(val resolver: Resolver, val codeGenerator: CodeGenerator) : KoraExtension {
         private val interfaceDeclaration = resolver.getClassDeclarationByName(Interface1::class.qualifiedName!!)!!
         private val interfaceType = interfaceDeclaration.asStarProjectedType()
-        override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
+        override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
             if (type != interfaceType) {
+                return null
+            }
+            if (tag.isNotEmpty()) {
                 return null
             }
             val packageName = interfaceDeclaration.packageName.asString()

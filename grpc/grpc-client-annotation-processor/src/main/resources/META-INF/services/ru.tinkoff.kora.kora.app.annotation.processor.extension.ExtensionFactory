@@ -1,1 +1,1 @@
-ru.tinkoff.grpc.client.GrpcClientExtensionFactory
+ru.tinkoff.grpc.client.annotation.processor.GrpcClientExtensionFactory

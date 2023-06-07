@@ -5,12 +5,12 @@ plugins {
 apply from: "${project.rootDir}/kotlin-plugin.gradle"
 
 dependencies {
+    api libs.kotlinpoet
+    api libs.kotlinpoet.ksp
+    api libs.ksp.api
     api project(':common')// todo delete
 
-    implementation libs.ksp.api
     implementation libs.kotlin.reflect
-    implementation libs.kotlinpoet
-    implementation libs.kotlinpoet.ksp
 
 
     testFixturesImplementation libs.kotlin.compile.testing

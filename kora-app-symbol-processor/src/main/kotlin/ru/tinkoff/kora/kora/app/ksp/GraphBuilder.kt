@@ -162,12 +162,12 @@ object GraphBuilder {
                     stack.addLast(
                         ProcessingState.ResolutionFrame.Component(
                             optionalDeclaration, listOf(
-                                DependencyClaim(
-                                    dependencyClaim.type.arguments[0].type!!.resolve().makeNotNullable(),
-                                    dependencyClaim.tags,
-                                    NULLABLE_ONE
-                                )
+                            DependencyClaim(
+                                dependencyClaim.type.arguments[0].type!!.resolve().makeNotNullable(),
+                                dependencyClaim.tags,
+                                NULLABLE_ONE
                             )
+                        )
                         )
                     )
                     continue@frame
@@ -180,12 +180,21 @@ object GraphBuilder {
                     stack.addAll(findInterceptors(ctx, processing, finalClassComponent))
                     continue@frame
                 }
-                val extension = ctx.extensions.findExtension(ctx.resolver, dependencyClaim.type)
+                val extension = ctx.extensions.findExtension(ctx.resolver, dependencyClaim.type, dependencyClaim.tags)
                 if (extension != null) {
                     val extensionResult = extension()
                     if (extensionResult is ExtensionResult.RequiresCompilingResult) {
                         stack.addLast(frame.copy(currentDependency = currentDependency))
                         throw NewRoundException(processing, extension, dependencyClaim.type, dependencyClaim.tags)
+                    } else if (extensionResult is ExtensionResult.CodeBlockResult) {
+                        val extensionComponent = ComponentDeclaration.fromExtension(extensionResult)
+                        if (extensionComponent.isTemplate()) {
+                            processing.templateDeclarations.add(extensionComponent)
+                        } else {
+                            processing.sourceDeclarations.add(extensionComponent)
+                        }
+                        stack.addLast(frame.copy(currentDependency = currentDependency))
+                        continue@frame
                     } else {
                         extensionResult as ExtensionResult.GeneratedResult
                         val extensionComponent = ComponentDeclaration.fromExtension(extensionResult)
@@ -402,10 +411,10 @@ object GraphBuilder {
                 listOf(
                     ComponentDependency.PromisedProxyParameterDependency(
                         declaration, DependencyClaim(
-                            declaration.type,
-                            declaration.tags,
-                            ONE_REQUIRED
-                        )
+                        declaration.type,
+                        declaration.tags,
+                        ONE_REQUIRED
+                    )
                     )
                 )
             )

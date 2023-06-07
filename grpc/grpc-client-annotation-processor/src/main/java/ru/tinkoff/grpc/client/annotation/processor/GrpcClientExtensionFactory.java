@@ -1,4 +1,4 @@
-package ru.tinkoff.grpc.client;
+package ru.tinkoff.grpc.client.annotation.processor;
 
 import ru.tinkoff.kora.kora.app.annotation.processor.extension.ExtensionFactory;
 import ru.tinkoff.kora.kora.app.annotation.processor.extension.KoraExtension;
@@ -6,7 +6,7 @@ import ru.tinkoff.kora.kora.app.annotation.processor.extension.KoraExtension;
 import javax.annotation.processing.ProcessingEnvironment;
 import java.util.Optional;
 
-import static ru.tinkoff.grpc.client.GrpcClassNames.abstractStub;
+import static ru.tinkoff.grpc.client.annotation.processor.GrpcClassNames.abstractStub;
 
 public class GrpcClientExtensionFactory implements ExtensionFactory {
     @Override

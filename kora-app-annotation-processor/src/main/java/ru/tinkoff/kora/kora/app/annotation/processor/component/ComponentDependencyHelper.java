@@ -8,7 +8,10 @@ import ru.tinkoff.kora.annotation.processor.common.TagUtils;
 import ru.tinkoff.kora.kora.app.annotation.processor.component.DependencyClaim.DependencyClaimType;
 import ru.tinkoff.kora.kora.app.annotation.processor.declaration.ComponentDeclaration;
 
+import javax.annotation.Nullable;
 import javax.lang.model.AnnotatedConstruct;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.TypeMirror;
@@ -53,18 +56,22 @@ public class ComponentDependencyHelper {
             return result;
         } else if (componentDeclaration instanceof ComponentDeclaration.FromExtensionComponent fromExtension) {
             var result = new ArrayList<DependencyClaim>(fromExtension.methodParameterTypes().size() + 1);
+            var executable = fromExtension.source().getKind() == ElementKind.METHOD || fromExtension.source().getKind() == ElementKind.CONSTRUCTOR
+                ? (ExecutableElement) fromExtension.source()
+                : null;
             for (int i = 0; i < fromExtension.methodParameterTypes().size(); i++) {
                 var parameterType = fromExtension.methodParameterTypes().get(i);
                 var tags = fromExtension.methodParameterTags().get(i);
-                result.add(parseClaim(fromExtension.source(), parameterType, tags));
+                var element = executable == null ? null : executable.getParameters().get(i);
+                result.add(parseClaim(element, parameterType, tags));
             }
             return result;
         }
         throw new IllegalArgumentException();
     }
 
-    public static DependencyClaim parseClaim(AnnotatedConstruct element, TypeMirror parameterType, Set<String> tags) {
-        return parseClaim(parameterType, tags, CommonUtils.isNullable(element));
+    public static DependencyClaim parseClaim(@Nullable AnnotatedConstruct element, TypeMirror parameterType, Set<String> tags) {
+        return parseClaim(parameterType, tags, element != null && CommonUtils.isNullable(element));
     }
 
     public static DependencyClaim parseClaim(TypeMirror parameterType, Set<String> tags, boolean isNullable) {

@@ -13,4 +13,8 @@ public record GrpcClientConfig(String url, Duration timeout) {
 
         return new GrpcClientConfig(url, timeout);
     }
+
+    public boolean telemetryEnabled() {
+        return false;
+    }
 }

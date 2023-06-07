@@ -1,4 +1,4 @@
-package ru.tinkoff.grpc.client;
+package ru.tinkoff.grpc.client.annotation.processor;
 
 
 import org.assertj.core.api.Assertions;

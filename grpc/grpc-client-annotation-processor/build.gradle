@@ -16,6 +16,7 @@ dependencies {
 
 apply from: "${project.rootDir}/in-test-generated.gradle"
 
+def grpcVersion = libs.versions.grpc.java.get()
 
 protobuf {
     protoc {
@@ -23,7 +24,7 @@ protobuf {
     }
     plugins {
         grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.42.1"
+            artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
         }
     }
     generateProtoTasks {

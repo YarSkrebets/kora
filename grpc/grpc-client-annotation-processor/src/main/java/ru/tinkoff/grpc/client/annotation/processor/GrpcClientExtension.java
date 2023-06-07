@@ -1,4 +1,4 @@
-package ru.tinkoff.grpc.client;
+package ru.tinkoff.grpc.client.annotation.processor;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static ru.tinkoff.grpc.client.GrpcClassNames.*;
+import static ru.tinkoff.grpc.client.annotation.processor.GrpcClassNames.*;
 
 public final class GrpcClientExtension implements KoraExtension {
     private final ProcessingEnvironment env;
@@ -82,7 +82,7 @@ public final class GrpcClientExtension implements KoraExtension {
         var parameterTypes = new ArrayList<TypeMirror>(managedChannelConstructor.getParameters().size());
         for (int i = 0; i < managedChannelConstructor.getParameters().size(); i++) {
             var parameter = managedChannelConstructor.getParameters().get(i);
-            parameterTags.add(i == 0 || i == 1 ? tag : Set.of());
+            parameterTags.add(i < 3 ? tag : Set.of());
             parameterTypes.add(parameter.asType());
         }
         return () -> new ExtensionResult.CodeBlockResult(

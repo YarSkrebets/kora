@@ -10,11 +10,11 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.ksp.writeTo
-import ru.tinkoff.kora.common.KoraApp
-import ru.tinkoff.kora.annotation.processor.common.MockLifecycle
 import org.mockito.Mockito
 import reactor.core.publisher.Mono
+import ru.tinkoff.kora.annotation.processor.common.MockLifecycle
 import ru.tinkoff.kora.application.graph.GraphInterceptor
+import ru.tinkoff.kora.common.KoraApp
 import ru.tinkoff.kora.kora.app.ksp.extension.ExtensionFactory
 import ru.tinkoff.kora.kora.app.ksp.extension.ExtensionResult
 import ru.tinkoff.kora.kora.app.ksp.extension.KoraExtension
@@ -51,10 +51,14 @@ interface AppWithInterceptor {
         private val interfaceDeclaration = resolver.getClassDeclarationByName(Interface1::class.qualifiedName!!)!!
         private val interfaceType = interfaceDeclaration.asStarProjectedType()
 
-        override fun getDependencyGenerator(resolver: Resolver, type: KSType): (() -> ExtensionResult)? {
+        override fun getDependencyGenerator(resolver: Resolver, type: KSType, tag: Set<String>): (() -> ExtensionResult)? {
             if (!(type == interfaceType || type == interfaceType.makeNullable())) {
                 return null
             }
+            if (tag.isNotEmpty()) {
+                return null
+            }
+
             return ret@{
                 val packageName = interfaceDeclaration.packageName.asString()
                 val typeName = "AppWithInterceptorInterface1Impl"

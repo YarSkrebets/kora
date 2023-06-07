@@ -4,10 +4,10 @@ import io.grpc.*;
 import org.jetbrains.annotations.Nullable;
 import ru.tinkoff.kora.common.Context;
 
-public final class TelemetryInterceptor implements ClientInterceptor {
+public final class GrpcClientTelemetryInterceptor implements ClientInterceptor {
     private final GrpcClientTelemetry telemetry;
 
-    public TelemetryInterceptor(GrpcClientTelemetry telemetry) {
+    public GrpcClientTelemetryInterceptor(GrpcClientTelemetry telemetry) {
         this.telemetry = telemetry;
     }
 
