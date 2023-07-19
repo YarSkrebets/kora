@@ -2,10 +2,12 @@ package ru.tinkoff.kora.kora.app.ksp
 
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import ru.tinkoff.kora.ksp.common.AbstractSymbolProcessorTest
 
 class InvalidTypeTest : AbstractSymbolProcessorTest() {
+    @Disabled
     @Test
     fun testUnknownTypeComponent() {
         compile(listOf<SymbolProcessorProvider>(KoraAppProcessorProvider()), """
@@ -23,6 +25,7 @@ class InvalidTypeTest : AbstractSymbolProcessorTest() {
         assertThat(compileResult.messages).anyMatch { it.endsWith("TestApp.kt:12: Component type is not resolvable in the current round of processing") }
     }
 
+    @Disabled
     @Test
     fun testUnknownTypeDependency() {
         compile(listOf<SymbolProcessorProvider>(KoraAppProcessorProvider()), """

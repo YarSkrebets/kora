@@ -13,7 +13,7 @@ public final class GrpcClientTelemetryInterceptor implements ClientInterceptor {
 
     @Override
     public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(MethodDescriptor<ReqT, RespT> method, CallOptions callOptions, Channel next) {
-        var ctx = Context.clear();
+        var ctx = Context.current();
         var grpcCtx = this.telemetry.get(ctx);
 
         var call = next.newCall(method, callOptions);
@@ -23,16 +23,18 @@ public final class GrpcClientTelemetryInterceptor implements ClientInterceptor {
 
     private static final class MyClientCall<ReqT, RespT> extends ClientCall<ReqT, RespT> {
         private final ClientCall<ReqT, RespT> delegate;
-        private final GrpcClientTelemetry.GrpcClientTelemetryCtx telemetry;
+        private final GrpcClientTelemetry.GrpcClientTelemetryContext telemetryContext;
 
-        private MyClientCall(ClientCall<ReqT, RespT> delegate, GrpcClientTelemetry.GrpcClientTelemetryCtx telemetry) {
+        private MyClientCall(ClientCall<ReqT, RespT> delegate, GrpcClientTelemetry.GrpcClientTelemetryContext telemetryContext) {
             this.delegate = delegate;
-            this.telemetry = telemetry;
+            this.telemetryContext = telemetryContext;
         }
 
         @Override
         public void start(Listener<RespT> responseListener, Metadata headers) {
-            delegate.start(new MyListener<>(responseListener, telemetry), headers);
+            // todo: make span, fill headers
+            var patchedHeaders = telemetryContext.startSendMessage(headers);
+            delegate.start(new MyListener<>(responseListener, telemetryContext), patchedHeaders);
         }
 
         @Override
@@ -74,11 +76,11 @@ public final class GrpcClientTelemetryInterceptor implements ClientInterceptor {
     // TODO
     private static class MyListener<RespT> extends ClientCall.Listener<RespT> {
         private final ClientCall.Listener<RespT> responseListener;
-        private final GrpcClientTelemetry.GrpcClientTelemetryCtx telemetry;
+        private final GrpcClientTelemetry.GrpcClientTelemetryContext telemetryContext;
 
-        public MyListener(ClientCall.Listener<RespT> responseListener, GrpcClientTelemetry.GrpcClientTelemetryCtx telemetry) {
+        public MyListener(ClientCall.Listener<RespT> responseListener, GrpcClientTelemetry.GrpcClientTelemetryContext telemetryContext) {
             this.responseListener = responseListener;
-            this.telemetry = telemetry;
+            this.telemetryContext = telemetryContext;
         }
 
         @Override
@@ -93,6 +95,8 @@ public final class GrpcClientTelemetryInterceptor implements ClientInterceptor {
 
         @Override
         public void onClose(Status status, Metadata trailers) {
+            telemetryContext.finishMessage(trailers, status, null);
+            // todo: try read headers, if failed(or status failed) fail span.
             responseListener.onClose(status, trailers);
         }
 

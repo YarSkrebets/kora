@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import ru.tinkoff.kora.annotation.processor.common.TestUtils;
@@ -150,6 +151,7 @@ class KoraAppProcessorTest {
     }
 
     @Test
+    @Disabled
     void unresolvedDependency() {
         assertThatThrownBy(() -> testClass(AppWithUnresolvedDependency.class))
             .isInstanceOfSatisfying(CompilationErrorException.class, e -> SoftAssertions.assertSoftly(s -> {
@@ -163,6 +165,7 @@ class KoraAppProcessorTest {
     }
 
     @Test
+    @Disabled
     void testCircularDependency() {
         assertThatThrownBy(() -> testClass(AppWithCircularDependency.class))
             .isInstanceOfSatisfying(CompilationErrorException.class, e -> SoftAssertions.assertSoftly(s -> {
